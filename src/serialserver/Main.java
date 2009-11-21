@@ -3,6 +3,7 @@
  */
 package serialserver;
 
+import serialserver.exceptions.MissingPort;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,9 +29,11 @@ public class Main {
 
             startServer(config);
 
+        } catch(MissingPort ex) {
+            log.severe(ex.getMessage());
+            listAvailablePorts();
         } catch(IllegalArgumentException ex) {
             log.severe(ex.getMessage());
-            return;
         }
     }
 
@@ -38,6 +41,7 @@ public class Main {
         OptionParser parser = new OptionParser() {
             {
                 accepts("serial-port", "serial port").withRequiredArg();
+                accepts("serial-speed", "serial port speed").withRequiredArg().ofType(Integer.class);
                 accepts("listen-port", "server listen port").withRequiredArg().ofType(Integer.class);
                 accepts("debug", "display debug info");
                 acceptsAll(asList("h", "help", "?"), "show help");
@@ -57,12 +61,13 @@ public class Main {
         if(options.hasArgument("serial-port")) {
             config.setSerialPort(String.valueOf(options.valueOf("serial-port")));
         } else {
-            throw new IllegalArgumentException("Expecting serial port as a command line argument.");
+            throw new MissingPort("Expecting serial port as a command line argument.");
+        }
+        if(options.hasArgument("serial-speed")) {
+            config.setSerialSpeed(String.valueOf(options.valueOf("serial-speed")));
         }
         if(options.hasArgument("listen-port")) {
-            config.setServerPort(Integer.parseInt(String.valueOf(options.valueOf("listen-port"))));
-        } else {
-            throw new IllegalArgumentException("Expecting listen port as a command line argument.");
+            config.setServerPort(String.valueOf(options.valueOf("listen-port")));
         }
         if(options.has("debug")) {
             config.setDebug(true);
@@ -71,16 +76,20 @@ public class Main {
         return config;
     }
 
+    private static void startServer(Config config) {
+        log.info("Starting server and connecting to port.");
+
+    }
+
+    private static void listAvailablePorts() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     private static List<String> asList(String ... args) {
         List<String> result = new LinkedList<String>();
         for(String arg : args) {
             result.add(arg);
         }
         return result;
-    }
-
-    private static void startServer(Config config) {
-        log.info("Starting server and connecting to port.");
-        
     }
 }

@@ -6,8 +6,21 @@ package serialserver;
 public class Config {
 
     private String serialPort;
+    private int serialSpeed = 9600;
     private int serverPort = 9000;
     private boolean debug = false;
+
+    public int getSerialSpeed() {
+        return serialSpeed;
+    }
+
+    public void setSerialSpeed(int serialSpeed) {
+        this.serialSpeed = serialSpeed;
+    }
+
+    public void setSerialSpeed(String serialSpeed) {
+        this.serialSpeed = Integer.parseInt(serialSpeed);
+    }
 
     public boolean isDebug() {
         return debug;
@@ -33,8 +46,13 @@ public class Config {
         this.serverPort = serverPort;
     }
 
+    public void setServerPort(String serverPort) {
+        this.serverPort = Integer.parseInt(serverPort);
+    }
+
+    @Override
     public String toString() {
-        return "<SerialPort:" + serialPort + ", ServerPort:"
-                + serverPort + " Debug:" + debug + ">";
+        return "<SerialPort:" + serialPort + ", SerialSpeed: " + serialSpeed +
+                ", ServerPort:" + serverPort + " Debug:" + debug + ">";
     }
 }
