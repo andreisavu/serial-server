@@ -1,5 +1,6 @@
 package serialserver.impl;
 
+import java.util.logging.Level;
 import serialserver.interfaces.BaseSerialPort;
 import serialserver.interfaces.SerialListener;
 import gnu.io.CommDriver;
@@ -28,16 +29,21 @@ public class GNUSerialPort implements SerialPortEventListener, BaseSerialPort {
     private SerialPort serialPort = null;
     private SerialListener parent;
 
-    public GNUSerialPort(String _drivername, SerialListener _parent) {
+    public GNUSerialPort(String _drivername, SerialListener _parent) throws ClassNotFoundException {
         parent = _parent;
         if (_drivername == null) {
             _drivername = "gnu.io.RXTXCommDriver";
         }
+
         try {
             CommDriver driver = (CommDriver) Class.forName(_drivername).newInstance();
             driver.initialize();
-        } catch (Exception e) {
-            log.severe("Class not found:" + _drivername);
+        } catch (InstantiationException ex) {
+            log.severe(ex.toString());
+            throw new Error(ex);
+        } catch (IllegalAccessException ex) {
+            log.severe(ex.toString());
+            throw new Error(ex);
         }
     }
 

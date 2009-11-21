@@ -29,7 +29,7 @@ public class SunCommSerialPort implements SerialPortEventListener, BaseSerialPor
     private SerialPort serialPort = null;
     private SerialListener parent;
 
-    SunCommSerialPort(String _drivername, SerialListener _parent) {
+    SunCommSerialPort(String _drivername, SerialListener _parent) throws ClassNotFoundException {
         parent = _parent;
         if (_drivername == null) {
             _drivername = "com.sun.comm.Win32Driver";
@@ -37,8 +37,12 @@ public class SunCommSerialPort implements SerialPortEventListener, BaseSerialPor
         try {
             CommDriver driver = (CommDriver) Class.forName(_drivername).newInstance();
             driver.initialize();
-        } catch (Exception e) {
-            log.severe("Class not found:" + _drivername);
+        } catch (InstantiationException ex) {
+            log.severe(ex.toString());
+            throw new Error(ex);
+        } catch (IllegalAccessException ex) {
+            log.severe(ex.toString());
+            throw new Error(ex);
         }
     }
 
