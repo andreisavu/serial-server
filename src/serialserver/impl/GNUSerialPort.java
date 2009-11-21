@@ -1,6 +1,5 @@
 package serialserver.impl;
 
-import java.util.logging.Level;
 import serialserver.interfaces.BaseSerialPort;
 import serialserver.interfaces.SerialListener;
 import gnu.io.CommDriver;

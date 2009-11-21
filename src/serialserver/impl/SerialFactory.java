@@ -38,9 +38,9 @@ public class SerialFactory {
     public static BaseSerialPort createInstance(String platform, SerialListener listener) 
     throws ClassNotFoundException {
         if(platform.equals("rxtx")) {
-            return new GNUSerialPort(platform, listener);
+            return new GNUSerialPort(null, listener);
         } else if(platform.equals("sun")) {
-            return new SunCommSerialPort(platform, listener);
+            return new SunCommSerialPort(null, listener);
         } else {
             throw new Error("Undefined platform");
         }

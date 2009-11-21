@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import serialserver.impl.SerialFactory;
+import serialserver.interfaces.BaseSerialPort;
 
 /**
  * Application entry class. Parse command line arguments and init server.
@@ -82,7 +84,14 @@ public class Main {
     }
 
     private static void listAvailablePorts() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.info("Listing all available serial ports");
+        BaseSerialPort serial = SerialFactory.createInstance(null);
+        if(serial != null) {
+            List<String[]> ports = serial.getPortsList();
+            for(String[] pair : ports) {
+                System.out.println(pair[0] + " " + pair[1]);
+            }
+        }
     }
 
     private static List<String> asList(String ... args) {
