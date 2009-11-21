@@ -1,0 +1,6 @@
+
+Cross-platform serial to tcp/ip proxy server
+--------------------------------------------
+
+A small tool that you can use to map a serial port to a tcp/ip port. 
+
