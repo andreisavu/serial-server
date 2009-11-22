@@ -45,6 +45,7 @@ public class StreamServer {
 
             exit(reader, writer);
             client.close();
+            join(reader, writer);
         } catch (IOException ex) {
             log.severe(ex.getMessage());
         }
@@ -54,6 +55,15 @@ public class StreamServer {
         for (StreamConnector c : connectors) {
             c.exit();
             c.interrupt();
+        }
+    }
+
+    private void join(StreamConnector... connectors) {
+        for (StreamConnector c : connectors) {
+            try {
+                c.join();
+            } catch (InterruptedException ex) {
+            }
         }
     }
 
