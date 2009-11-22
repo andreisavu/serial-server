@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import serialserver.interfaces.BaseSerialPort;
+import serialserver.interfaces.SerialListener;
 
 /**
  * Application entry class. Parse command line arguments and init server.
@@ -29,14 +30,14 @@ public class Main {
             Config config = parseCommandLine(args);
             log.info(config.toString());
 
-            startServer(config);
+            runServer(config);
 
-        } catch(MissingPort ex) {
+        } catch (MissingPort ex) {
             log.severe(ex.getMessage());
             listAvailablePorts();
             System.exit(-1);
 
-        } catch(IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             log.severe(ex.getMessage());
             System.exit(-2);
         }
@@ -44,6 +45,7 @@ public class Main {
 
     private static Config parseCommandLine(String[] args) {
         OptionParser parser = new OptionParser() {
+
             {
                 accepts("serial-port", "serial port").withRequiredArg();
                 accepts("serial-speed", "serial port speed").withRequiredArg().ofType(Integer.class);
@@ -54,7 +56,7 @@ public class Main {
         };
 
         OptionSet options = parser.parse(args);
-        if(options.has("?")) {
+        if (options.has("?")) {
             try {
                 parser.printHelpOn(System.out);
             } catch (IOException ex) {
@@ -63,43 +65,54 @@ public class Main {
         }
 
         Config config = new Config();
-        if(options.hasArgument("serial-port")) {
+        if (options.hasArgument("serial-port")) {
             config.setSerialPort(String.valueOf(options.valueOf("serial-port")));
         } else {
             throw new MissingPort("Expecting serial port as a command line argument.");
         }
-        if(options.hasArgument("serial-speed")) {
+        if (options.hasArgument("serial-speed")) {
             config.setSerialSpeed(String.valueOf(options.valueOf("serial-speed")));
         }
-        if(options.hasArgument("listen-port")) {
+        if (options.hasArgument("listen-port")) {
             config.setServerPort(String.valueOf(options.valueOf("listen-port")));
         }
-        if(options.has("debug")) {
+        if (options.has("debug")) {
             config.setDebug(true);
         }
 
         return config;
     }
 
-    private static void startServer(Config config) {
-        log.info("Starting server and connecting to port.");
-
+    private static void runServer(Config config) {
+        log.info("Starting server and connecting to serial port.");
+        try {
+            BaseSerialPort serial = SerialFactory.createInstance(null);
+            if(serial.connect(config.getSerialPort(), config.getSerialSpeed())) {
+                StreamServer server = new StreamServer(config.getServerPort(),
+                    serial.getInputStream(), serial.getOutputStream());
+                server.run();
+            } else {
+                log.severe("Serial port connection failed");
+            }
+        } catch (IOException ex) {
+            log.severe(ex.getMessage());
+        }
     }
 
     private static void listAvailablePorts() {
         log.info("Listing all available serial ports");
         BaseSerialPort serial = SerialFactory.createInstance(null);
-        if(serial != null) {
+        if (serial != null) {
             List<String[]> ports = serial.getPortsList();
-            for(String[] pair : ports) {
+            for (String[] pair : ports) {
                 System.out.println(pair[0] + " " + pair[1]);
             }
         }
     }
 
-    private static List<String> asList(String ... args) {
+    private static List<String> asList(String... args) {
         List<String> result = new LinkedList<String>();
-        for(String arg : args) {
+        for (String arg : args) {
             result.add(arg);
         }
         return result;
