@@ -53,6 +53,7 @@ public class StreamServer {
     private void exit(StreamConnector... connectors) {
         for (StreamConnector c : connectors) {
             c.exit();
+            c.interrupt();
         }
     }
 

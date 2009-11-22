@@ -32,14 +32,14 @@ public class StreamConnector extends Thread {
             log.info("Starting connector thread #" + getId());
             while (!should_exit) {
                 if(in.available() > 0) {
-                    int toRead = in.available();
-                    byte[] data = new byte[toRead];
-
-                    in.read(data, 0, toRead);
+                    int data = in.read();
+                    if(data == -1) {
+                        break;
+                    }
                     out.write(data);
                 } else {
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(50);
                     } catch (InterruptedException ex) {
                     }
                 }
