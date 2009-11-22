@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
+import serialserver.util.Latch;
 
 /**
  * Server for serial port. Allow only one active connection at a given time.
@@ -36,18 +37,14 @@ public class StreamServer {
     private void handle(Socket client) {
         log.info("Got client connection: " + client.getInetAddress().toString());
         try {
-            synchronized (this) {
-                StreamConnector reader = createReader(client);
-                StreamConnector writer = createWriter(client);
+            Latch latch = new Latch(1);
+            StreamConnector reader = createReader(client, latch);
+            StreamConnector writer = createWriter(client, latch);
 
-                try {
-                    wait();
-                } catch (InterruptedException ex) {
-                }
+            latch.awaitZero();
 
-                exit(reader, writer);
-                client.close();
-            }
+            exit(reader, writer);
+            client.close();
         } catch (IOException ex) {
             log.severe(ex.getMessage());
         }
@@ -59,17 +56,17 @@ public class StreamServer {
         }
     }
 
-    private StreamConnector createReader(Socket client)
+    private StreamConnector createReader(Socket client, Latch latch)
             throws IOException {
-        StreamConnector reader = new StreamConnector(this,
+        StreamConnector reader = new StreamConnector(latch,
                 in, client.getOutputStream(), true);
         reader.start();
         return reader;
     }
 
-    private StreamConnector createWriter(Socket client)
+    private StreamConnector createWriter(Socket client, Latch latch)
             throws IOException {
-        StreamConnector writer = new StreamConnector(this,
+        StreamConnector writer = new StreamConnector(latch,
                 client.getInputStream(), out, true);
         writer.start();
         return writer;

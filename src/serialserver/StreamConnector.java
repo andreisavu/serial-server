@@ -3,8 +3,8 @@ package serialserver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import serialserver.util.Latch;
 
 /**
  * Read from input stream and write to output stream 
@@ -15,15 +15,15 @@ public class StreamConnector extends Thread {
     private InputStream in;
     private OutputStream out;
     private boolean debug;
-    private final Object monitor;
+    private final Latch latch;
 
     private volatile boolean should_exit = false;
 
-    public StreamConnector(Object _monitor, InputStream _in, OutputStream _out, boolean _debug) {
+    public StreamConnector(Latch _latch, InputStream _in, OutputStream _out, boolean _debug) {
         in = _in;
         out = _out;
         debug = _debug;
-        monitor = _monitor;
+        latch = _latch;
     }
 
     @Override
@@ -48,10 +48,7 @@ public class StreamConnector extends Thread {
         } catch (IOException ex) {
             log.severe("Thread #" + getId() + " " + ex.getMessage());
         }
-
-        synchronized (monitor) {
-            monitor.notify();   // The connector will exit. Notify main thread.
-        }
+        latch.decrement();
     }
 
     public void exit() {
