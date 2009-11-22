@@ -50,9 +50,10 @@ You can download a recent rxtx version from [here (rxtx-2.1.7)](http://cloud.git
 If you want to use sun java comm classes you can downloaded them from [here](http://cloud.github.com/downloads/andreisavu/serial-server/commapi-win32.zip). 
 
 In order to install it follow the steps bellow:
-1. comm.jar or RXTXcomm.jar goes in c:\...jre\lib\ext\
-2. win32com.dll or rxtxSerial.dll goes in c:\...jre\bin\
-3. javax.comm.properties goes in c:\...jre\lib\ 
+
+*  comm.jar or RXTXcomm.jar goes in c:\...jre\lib\ext\
+*  win32com.dll or rxtxSerial.dll goes in c:\...jre\bin\
+*  javax.comm.properties goes in c:\...jre\lib\ 
 
 Have fun!
 
