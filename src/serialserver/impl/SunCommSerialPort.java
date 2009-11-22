@@ -18,7 +18,6 @@ import serialserver.interfaces.SerialListener;
 
 /**
  *
- * @author andrei
  */
 public class SunCommSerialPort implements SerialPortEventListener, BaseSerialPort {
 
