@@ -47,8 +47,9 @@ public class StreamConnector extends Thread {
             log.info("Normal exit thread #" + getId());
         } catch (IOException ex) {
             log.severe("Thread #" + getId() + " " + ex.getMessage());
+        } finally {
+            latch.decrement();
         }
-        latch.decrement();
     }
 
     public void exit() {
