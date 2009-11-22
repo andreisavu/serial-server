@@ -3,6 +3,7 @@
  */
 package serialserver;
 
+import serialserver.impl.SerialFactory;
 import serialserver.exceptions.MissingPort;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -11,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import serialserver.impl.SerialFactory;
 import serialserver.interfaces.BaseSerialPort;
 
 /**
@@ -34,8 +34,11 @@ public class Main {
         } catch(MissingPort ex) {
             log.severe(ex.getMessage());
             listAvailablePorts();
+            System.exit(-1);
+
         } catch(IllegalArgumentException ex) {
             log.severe(ex.getMessage());
+            System.exit(-2);
         }
     }
 
