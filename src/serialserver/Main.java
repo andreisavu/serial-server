@@ -88,7 +88,7 @@ public class Main {
         try {
             BaseSerialPort serial = SerialFactory.createInstance(null);
             if(serial.connect(config.getSerialPort(), config.getSerialSpeed())) {
-                StreamServer server = new StreamServer(config.getServerPort(),
+                SerialStreamServer server = new SerialStreamServer(config.getServerPort(),
                     serial.getInputStream(), serial.getOutputStream());
                 server.run();
             } else {
