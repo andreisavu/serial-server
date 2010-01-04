@@ -17,12 +17,7 @@ public class SerialFactory {
         try {
             return createInstance("rxtx", listener);
         } catch(ClassNotFoundException e1) {
-            log.info("rxtx serial driver not found, trying javacomm");
-            try {
-                return createInstance("sun", listener);
-            } catch(ClassNotFoundException e2) {
-                log.severe("javacomm driver not found. Giving up.");
-            }
+            log.severe("no serial  driver found. please install rxtx.");
         }
         return null;
     }
@@ -39,8 +34,6 @@ public class SerialFactory {
     throws ClassNotFoundException {
         if(platform.equals("rxtx")) {
             return new GNUSerialPort(null, listener);
-        } else if(platform.equals("sun")) {
-            return new SunCommSerialPort(null, listener);
         } else {
             throw new Error("Undefined platform");
         }
