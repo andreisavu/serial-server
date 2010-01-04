@@ -12,18 +12,22 @@ import serialserver.util.Latch;
 public class StreamConnector extends Thread {
 
     private static Logger log = Logger.getLogger(StreamConnector.class.getName());
+
     private InputStream in;
     private OutputStream out;
-    private boolean debug;
-    private final Latch latch;
 
+    private final boolean debug;
+    private final Latch latch;
+    private final boolean block;
+    
     private volatile boolean should_exit = false;
 
-    public StreamConnector(Latch _latch, InputStream _in, OutputStream _out, boolean _debug) {
+    public StreamConnector(Latch _latch, InputStream _in, OutputStream _out, boolean _debug, boolean _block) {
         in = _in;
         out = _out;
         debug = _debug;
         latch = _latch;
+        block = _block;
     }
 
     @Override
@@ -31,7 +35,7 @@ public class StreamConnector extends Thread {
         try {
             log.info("Starting connector thread #" + getId());
             while (!should_exit) {
-                if(in.available() > 0) {
+                if(in.available() > 0 || this.block) {
                     int data = in.read();
                     if(data == -1) {
                         break;

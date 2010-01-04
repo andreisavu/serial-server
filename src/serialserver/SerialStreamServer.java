@@ -12,18 +12,18 @@ import serialserver.util.Latch;
  * Server for serial port. Allow only one active connection at a given time.
  * 
  */
-public class StreamServer {
+public class SerialStreamServer {
 
-    private static Logger log = Logger.getLogger(StreamServer.class.getName());
+    private static Logger log = Logger.getLogger(SerialStreamServer.class.getName());
     private ServerSocket server;
-    private InputStream in;
-    private OutputStream out;
+    private InputStream serial_in;
+    private OutputStream serial_out;
 
-    public StreamServer(int port, InputStream _in, OutputStream _out) throws IOException {
+    public SerialStreamServer(int port, InputStream _serial_in, OutputStream _serial_out) throws IOException {
         log.info("Starting to listen on port " + port);
         server = new ServerSocket(port, 0);
-        in = _in;
-        out = _out;
+        serial_in = _serial_in;
+        serial_out = _serial_out;
     }
 
     public void run() throws IOException {
@@ -38,10 +38,11 @@ public class StreamServer {
         log.info("Got client connection: " + client.getInetAddress().toString());
         try {
             Latch latch = new Latch(1);
-            StreamConnector reader = createReader(client, latch);
-            StreamConnector writer = createWriter(client, latch);
+            StreamConnector reader = createSerialReader(client, latch);
+            StreamConnector writer = createSerialWriter(client, latch);
 
             latch.awaitZero();
+            log.info("Pipe endpoint closed. Closing stream connectors.");
 
             exit(reader, writer);
             client.close();
@@ -67,18 +68,18 @@ public class StreamServer {
         }
     }
 
-    private StreamConnector createReader(Socket client, Latch latch)
+    private StreamConnector createSerialReader(Socket client, Latch latch)
             throws IOException {
         StreamConnector reader = new StreamConnector(latch,
-                in, client.getOutputStream(), true);
+                serial_in, client.getOutputStream(), /*debug=*/true, /*block=*/false);
         reader.start();
         return reader;
     }
 
-    private StreamConnector createWriter(Socket client, Latch latch)
+    private StreamConnector createSerialWriter(Socket client, Latch latch)
             throws IOException {
         StreamConnector writer = new StreamConnector(latch,
-                client.getInputStream(), out, true);
+                client.getInputStream(), serial_out, /*debug=*/true, /*block=*/true);
         writer.start();
         return writer;
     }
